@@ -5,9 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceStore.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseController
     {
         private readonly StoreContext _storeContext;
 
@@ -26,7 +24,12 @@ namespace ECommerceStore.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductById(int id)
         {
-            return await _storeContext.Products.FindAsync(id);
+            var product = await _storeContext.Products.FindAsync(id);
+
+            if (product is null)
+                return NotFound();
+
+            return product;
         }
     }
 }
