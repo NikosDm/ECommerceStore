@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ECommerceStore.Api.Data;
 using ECommerceStore.Api.DTOs;
 using ECommerceStore.Api.Entities;
+using ECommerceStore.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,17 +23,17 @@ namespace ECommerceStore.Api.Controllers
         [HttpGet(Name="GetBasket")]
         public async Task<ActionResult<BasketDTO>> GetBasket()
         {
-            var basket = await RetrieveBasket();
+            var basket = await RetrieveBasket(GetBuyerId());
 
             if (basket is null) return NotFound();
-            return MapBasketToDTO(basket);
+            return basket.MapBasketToDTO();
         }
 
         [HttpPost]
         public async Task<ActionResult<BasketDTO>> AddItemToBasket(int productId, int quantity)
         {
             // get basket || create basket
-            var basket = await RetrieveBasket();
+            var basket = await RetrieveBasket(GetBuyerId());
 
             if (basket is null) basket = CreateBasket();
 
@@ -46,7 +47,7 @@ namespace ECommerceStore.Api.Controllers
 
             var result = await _context.SaveChangesAsync() > 0;
 
-            if (result) return CreatedAtRoute("GetBasket", MapBasketToDTO(basket));
+            if (result) return CreatedAtRoute("GetBasket", basket.MapBasketToDTO());
 
             return BadRequest(new ProblemDetails { Title = "Problem saving item to basket" });
         }
@@ -55,7 +56,7 @@ namespace ECommerceStore.Api.Controllers
         public async Task<ActionResult<Basket>> RemoveBasketItem(int productId, int quantity)
         {
             // get basket
-            var basket = await RetrieveBasket();
+            var basket = await RetrieveBasket(GetBuyerId());
 
             if (basket is null) return NotFound();
 
@@ -70,38 +71,34 @@ namespace ECommerceStore.Api.Controllers
             return BadRequest(new ProblemDetails { Title = "Problem removing item from basket" });
         }
 
-        private BasketDTO MapBasketToDTO(Basket basket)
+        private async Task<Basket> RetrieveBasket(string buyerId)
         {
-            return new BasketDTO
+            if (string.IsNullOrWhiteSpace(buyerId)) 
             {
-                Id = basket.Id,
-                BuyerId = basket.BuyerId,
-                Items = basket.Items.Select(item => new BasketItemDTO
-                {
-                    ProductId = item.ProductId,
-                    Name = item.Product.Name,
-                    Price = item.Product.Price,
-                    Description = item.Product.Description,
-                    Type = item.Product.Type,
-                    Brand = item.Product.Brand,
-                    Quantity = item.Quantity
-                }).ToList()
-            };
-        }
+                Response.Cookies.Delete("buyerId");
+                return null;
+            }
 
-        private async Task<Basket> RetrieveBasket()
-        {
             return await _context.Baskets
                 .Include(x => x.Items)
                 .ThenInclude(p => p.Product)
-                .FirstOrDefaultAsync(x => x.BuyerId == Request.Cookies["buyerId"]);
+                .FirstOrDefaultAsync(x => x.BuyerId == buyerId);
+        }
+
+        private string GetBuyerId()
+        {
+            return User.Identity?.Name ?? Request.Cookies["buyerId"];
         }
         
         private Basket CreateBasket()
         {
-            var buyerId = Guid.NewGuid().ToString();
-            var cookieOptions = new CookieOptions { IsEssential = true, Expires = DateTime.Now.AddDays(30) };
-            Response.Cookies.Append("buyerId", buyerId, cookieOptions);
+            var buyerId = User.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(buyerId))
+            {
+                buyerId = Guid.NewGuid().ToString();
+                var cookieOptions = new CookieOptions { IsEssential = true, Expires = DateTime.Now.AddDays(30) };
+                Response.Cookies.Append("buyerId", buyerId, cookieOptions);
+            }
 
             var basket = new Basket { BuyerId = buyerId };
 
