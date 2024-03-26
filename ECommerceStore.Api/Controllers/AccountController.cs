@@ -76,7 +76,7 @@ namespace ECommerceStore.Api.Controllers
 
         [Authorize]
         [HttpGet("currentUser")]
-        public async Task<ActionResult<UserDTO>> GetCurrentUser()
+        public async Task<ActionResult<UserDTO>> GetCurrentUserAsync()
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
@@ -88,6 +88,16 @@ namespace ECommerceStore.Api.Controllers
                 Token = await _tokenService.GenerateToken(user),
                 Basket = userBasket?.MapBasketToDTO()
             };
+        }
+
+        [Authorize]
+        [HttpGet("savedAddress")]
+        public async Task<ActionResult<UserAddress>> GetSavedAddressAsync()
+        {
+            return await _userManager.Users
+                .Where(x => x.UserName == User.Identity.Name)
+                .Select(user => user.Address)
+                .FirstOrDefaultAsync();
         }
 
         private async Task<Basket> RetrieveBasket(string buyerId)
