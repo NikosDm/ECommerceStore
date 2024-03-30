@@ -32,10 +32,10 @@ namespace ECommerceStore.Api.Extensions
             var brandList = new List<string>();
             var typeList = new List<string>();
 
-            if (string.IsNullOrEmpty(brands)) 
+            if (!string.IsNullOrEmpty(brands)) 
                 brandList.AddRange(brands.ToLower().Split(",").ToList());
 
-            if (string.IsNullOrEmpty(types)) 
+            if (!string.IsNullOrEmpty(types)) 
                 typeList.AddRange(types.ToLower().Split(",").ToList());
 
             query = query.Where(p => brandList.Count == 0 || brandList.Contains(p.Brand.ToLower()));

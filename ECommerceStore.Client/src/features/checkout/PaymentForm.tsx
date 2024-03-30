@@ -1,15 +1,10 @@
-import {
-  Typography,
-  Grid,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-} from "@mui/material";
+import { Typography, Grid } from "@mui/material";
 import { useFormContext } from "react-hook-form";
 import AppTextInput from "../../app/components/AppTextInput";
+import AppCheckbox from "../../app/components/AppCheckbox";
 
 export default function PaymentForm() {
-  const { control } = useFormContext();
+  const { control, formState } = useFormContext();
   return (
     <>
       <Typography variant="h6" gutterBottom>
@@ -24,40 +19,24 @@ export default function PaymentForm() {
           />
         </Grid>
         <Grid item xs={12} md={6}>
-          <TextField
-            required
-            id="cardNumber"
+          <AppTextInput
+            name="cardNumber"
             label="Card number"
-            fullWidth
-            autoComplete="cc-number"
-            variant="standard"
+            control={control}
           />
         </Grid>
         <Grid item xs={12} md={6}>
-          <TextField
-            required
-            id="expDate"
-            label="Expiry date"
-            fullWidth
-            autoComplete="cc-exp"
-            variant="standard"
-          />
+          <AppTextInput name="expDate" label="Expiry date" control={control} />
         </Grid>
         <Grid item xs={12} md={6}>
-          <TextField
-            required
-            id="cvv"
-            label="CVV"
-            helperText="Last three digits on signature strip"
-            fullWidth
-            autoComplete="cc-csc"
-            variant="standard"
-          />
+          <AppTextInput name="cvv" label="CVV" control={control} />
         </Grid>
         <Grid item xs={12}>
-          <FormControlLabel
-            control={<Checkbox color="secondary" name="saveCard" value="yes" />}
+          <AppCheckbox
+            disabled={!formState.isDirty}
+            name="saveCard"
             label="Remember credit card details for next time"
+            control={control}
           />
         </Grid>
       </Grid>

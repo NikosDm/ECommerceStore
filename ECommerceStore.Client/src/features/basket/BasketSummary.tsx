@@ -20,7 +20,7 @@ export default function BasketSummary({ subtotal }: BasketSummaryProps) {
         (sum, item) => sum + item.quantity * item.price,
         0
       ) ?? 0;
-  const deliveryFee = subtotal > 10000 ? 0 : 500;
+  const deliveryFee = subtotal > 100 ? 0 : 5;
 
   return (
     <TableContainer component={Paper} variant="outlined">
@@ -28,15 +28,15 @@ export default function BasketSummary({ subtotal }: BasketSummaryProps) {
         <TableBody>
           <TableRow>
             <TableCell colSpan={2}>Subtotal</TableCell>
-            <TableCell align="right">{subtotal}</TableCell>
+            <TableCell align="right">${subtotal}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell colSpan={2}>Delivery Fee*</TableCell>
-            <TableCell align="right">{deliveryFee}</TableCell>
+            <TableCell align="right">${deliveryFee}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell colSpan={2}>Total</TableCell>
-            <TableCell align="right">{subtotal + deliveryFee}</TableCell>
+            <TableCell align="right">${subtotal + deliveryFee}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>

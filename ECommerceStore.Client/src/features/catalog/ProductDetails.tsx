@@ -83,7 +83,7 @@ export default function ProductDetails() {
         <Typography variant="h3">{product.name}</Typography>
         <Divider sx={{ mb: 2 }}></Divider>
         <Typography variant="h4" color="secondary">
-          ${(product.price / 100).toFixed(2)}
+          ${product.price}
         </Typography>
         <TableContainer>
           <Table>
@@ -132,7 +132,7 @@ export default function ProductDetails() {
               size="large"
               variant="contained"
               fullWidth
-              loading={status.includes("pendingAddItem" + item?.productId)}
+              loading={status === "pendingAddItem" + item?.productId}
               onClick={handleUpdateCart}
             >
               {item ? "Update Quantity" : "Add to Cart"}

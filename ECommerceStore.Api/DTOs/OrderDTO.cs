@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ECommerceStore.Api.Entities.OrderAggregate;
 
 namespace ECommerceStore.Api.DTOs
@@ -11,11 +7,11 @@ namespace ECommerceStore.Api.DTOs
         public int Id { get; set; }
         public string BuyerId { get; set; }
         public ShippingAddress ShippingAddress { get; set; }
-        public DateTime OrderDate { get; set; }
+        public DateTimeOffset OrderDate { get; set; }
         public List<OrderItemDTO> OrderItems { get; set; }
-        public long Subtotal { get; set; }
-        public long DeliveryFee { get; set; }
+        public double Subtotal { get; set; }
+        public double DeliveryFee { get; set; }
         public string OrderStatus { get; set; }
-        public long Total { get; set; }
+        public double Total { get; set; }
     }
 }

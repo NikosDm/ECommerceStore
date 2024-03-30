@@ -41,6 +41,11 @@ export const fetchProductsAsync = createAsyncThunk<
   { state: RootState }
 >("catalog/fetchProductsAsync", async (_, thunkAPI) => {
   const params = getAxiosParams(thunkAPI.getState().catalog.productParams);
+
+  params.forEach((param) => {
+    console.log(param);
+  });
+
   try {
     const response = await agent.Catalog.list(params);
     thunkAPI.dispatch(setMetaData(response.metaData));

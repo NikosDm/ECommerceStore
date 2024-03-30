@@ -13,5 +13,41 @@ export const validationSchema = [
   yup.object(),
   yup.object({
     nameOnCard: yup.string().required("Name on card is required"),
+    cardNumber: yup
+      .string()
+      .required("Card number is required")
+      .matches(/^[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}$/, {
+        message: "Card Number format is invalid",
+      }),
+    expDate: yup
+      .string()
+      .required("Expiry date is required")
+      .matches(/^(0[1-9]|1[0-2])\/?(([0-9]{4}|[0-9]{2})$)/, {
+        message: "Expiry date should be in format MM/YYYY",
+      })
+      .test("checkDate", "Expiry date is invalid", (val, ctx) => {
+        const dateParts = val.split("/");
+        const month = Number(dateParts[0]);
+
+        if (month > 12) return ctx.createError({ message: "Month is invalid" });
+
+        const now = new Date();
+
+        if (
+          now.getMonth() > month ||
+          now.getFullYear() > Number(dateParts[1]) + 2000
+        )
+          return ctx.createError({
+            message: "Expiry date should not be in the past",
+          });
+
+        return true;
+      }),
+    cvv: yup
+      .string()
+      .required("CVV is required")
+      .matches(/^[0-9]{3}$/, {
+        message: "CVV is invalid",
+      }),
   }),
 ];

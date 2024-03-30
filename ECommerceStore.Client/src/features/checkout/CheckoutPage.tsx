@@ -48,7 +48,7 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
-    agent.Account.fetchAddress().then((response) => {
+    const addressPromise = agent.Account.fetchAddress().then((response) => {
       if (response) {
         methods.reset({
           ...methods.getValues(),
@@ -57,16 +57,36 @@ export default function CheckoutPage() {
         });
       }
     });
+    const cardPromise = agent.Account.fetchCardDetails().then((response) => {
+      if (response) {
+        methods.reset({
+          ...methods.getValues(),
+          ...response,
+          saveCard: false,
+        });
+      }
+    });
+    Promise.all([addressPromise, cardPromise]);
   }, [methods]);
 
   const handleNext = async (data: FieldValues) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { nameOnCard, saveAddress, ...shippingAddress } = data;
+    const {
+      nameOnCard,
+      saveCard,
+      cvv,
+      cardNumber,
+      expDate,
+      saveAddress,
+      ...shippingAddress
+    } = data;
     if (activeStep === steps.length - 1) {
       setLoading(true);
+      const paymentDetails = { nameOnCard, cvv, cardNumber, expDate };
       try {
         const orderNumber = await agent.Orders.create({
           saveAddress,
+          saveCard,
+          paymentDetails,
           shippingAddress,
         });
         setOrderNumber(orderNumber);

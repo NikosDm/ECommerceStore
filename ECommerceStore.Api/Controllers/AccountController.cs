@@ -100,6 +100,16 @@ namespace ECommerceStore.Api.Controllers
                 .FirstOrDefaultAsync();
         }
 
+        [Authorize]
+        [HttpGet("savedCard")]
+        public async Task<ActionResult<UserPaymentDetails>> GetSavedCardDetailsAsync()
+        {
+            return await _userManager.Users
+                .Where(x => x.UserName == User.Identity.Name)
+                .Select(user => user.PaymentDetails)
+                .FirstOrDefaultAsync();
+        }
+
         private async Task<Basket> RetrieveBasket(string buyerId)
         {
             if (string.IsNullOrWhiteSpace(buyerId)) 

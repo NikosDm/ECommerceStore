@@ -21,6 +21,7 @@ namespace ECommerceStore.Api.Extensions
                     ProductId = item.ProductId,
                     Name = item.Product.Name,
                     Price = item.Product.Price,
+                    PictureUrl = item.Product.PictureUrl,
                     Description = item.Product.Description,
                     Type = item.Product.Type,
                     Brand = item.Product.Brand,

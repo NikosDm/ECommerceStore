@@ -74,35 +74,51 @@ namespace ECommerceStore.Api.Controllers
             }
 
             var subtotal = items.Sum(item => item.Price * item.Quantity);
-            var deliveryFee = subtotal > 10000 ? 0 : 500;
+            var deliveryFee = subtotal > 100 ? 0 : 5;
 
             var order = new Order
             {
                 OrderItems = items,
                 BuyerId = User.Identity.Name,
                 ShippingAddress = orderDTO.ShippingAddress,
+                PaymentDetails = orderDTO.PaymentDetails,
                 Subtotal = subtotal,
                 DeliveryFee = deliveryFee
             };
 
             _context.Orders.Add(order);
             _context.Baskets.Remove(basket);
-
+            
+            var user = await _context.Users
+                    .Include(a => a.Address)
+                    .Include(p => p.PaymentDetails)
+                    .FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
+            
             if (orderDTO.SaveAddress) 
             {
-                var user = await _context.Users
-                    .Include(a => a.Address)
-                    .FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
                 var address = new UserAddress
                 {
                     FullName = orderDTO.ShippingAddress.FullName,
                     Address1 = orderDTO.ShippingAddress.Address1,
                     Address2 = orderDTO.ShippingAddress.Address2,
+                    State = orderDTO.ShippingAddress.State,
                     City = orderDTO.ShippingAddress.City,
                     Country = orderDTO.ShippingAddress.Country,
                     Zip = orderDTO.ShippingAddress.Zip,
                 };
                 user.Address = address;
+            }
+
+            if (orderDTO.SaveCard) 
+            {
+                var paymentDetails = new UserPaymentDetails
+                {
+                    CardNumber = orderDTO.PaymentDetails.CardNumber,
+                    ExpDate = orderDTO.PaymentDetails.ExpDate,
+                    NameOnCard = orderDTO.PaymentDetails.NameOnCard,
+                    Cvv = orderDTO.PaymentDetails.Cvv,
+                };
+                user.PaymentDetails = paymentDetails;
             }
 
             var result = await _context.SaveChangesAsync() > 0;

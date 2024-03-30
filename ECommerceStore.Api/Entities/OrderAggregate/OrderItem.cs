@@ -9,7 +9,7 @@ namespace ECommerceStore.Api.Entities.OrderAggregate
     {
         public int Id { get; set; }
         public ProductItemOrdered ItemOrdered { get; set; }
-        public long Price { get; set; }
+        public double Price { get; set; }
         public int Quantity { get; set; }
     }
 }

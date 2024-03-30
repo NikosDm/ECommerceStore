@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerceStore.Api.Data.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20240324010448_OrderEntityAdded")]
-    partial class OrderEntityAdded
+    [Migration("20240330002524_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,17 +78,17 @@ namespace ECommerceStore.Api.Data.Migrations
                     b.Property<string>("BuyerId")
                         .HasColumnType("text");
 
-                    b.Property<long>("DeliveryFee")
-                        .HasColumnType("bigint");
+                    b.Property<double>("DeliveryFee")
+                        .HasColumnType("double precision");
 
-                    b.Property<DateTime>("OrderDate")
+                    b.Property<DateTimeOffset>("OrderDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("OrderStatus")
                         .HasColumnType("integer");
 
-                    b.Property<long>("Subtotal")
-                        .HasColumnType("bigint");
+                    b.Property<double>("Subtotal")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
@@ -106,8 +106,8 @@ namespace ECommerceStore.Api.Data.Migrations
                     b.Property<int?>("OrderId")
                         .HasColumnType("integer");
 
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint");
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
@@ -139,8 +139,8 @@ namespace ECommerceStore.Api.Data.Migrations
                     b.Property<string>("PictureUrl")
                         .HasColumnType("text");
 
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint");
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision");
 
                     b.Property<int>("QuantityInStock")
                         .HasColumnType("integer");
@@ -294,6 +294,28 @@ namespace ECommerceStore.Api.Data.Migrations
                     b.ToTable("UserAddress");
                 });
 
+            modelBuilder.Entity("ECommerceStore.Api.Entities.UserPaymentDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CardNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Cvv")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExpDate")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NameOnCard")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserPaymentDetails");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -418,6 +440,31 @@ namespace ECommerceStore.Api.Data.Migrations
 
             modelBuilder.Entity("ECommerceStore.Api.Entities.OrderAggregate.Order", b =>
                 {
+                    b.OwnsOne("ECommerceStore.Api.Entities.OrderAggregate.OrderPaymentDetails", "PaymentDetails", b1 =>
+                        {
+                            b1.Property<int>("OrderId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("CardNumber")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Cvv")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("ExpDate")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("NameOnCard")
+                                .HasColumnType("text");
+
+                            b1.HasKey("OrderId");
+
+                            b1.ToTable("Orders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId");
+                        });
+
                     b.OwnsOne("ECommerceStore.Api.Entities.OrderAggregate.ShippingAddress", "ShippingAddress", b1 =>
                         {
                             b1.Property<int>("OrderId")
@@ -451,6 +498,9 @@ namespace ECommerceStore.Api.Data.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("OrderId");
                         });
+
+                    b.Navigation("PaymentDetails")
+                        .IsRequired();
 
                     b.Navigation("ShippingAddress")
                         .IsRequired();
@@ -492,6 +542,15 @@ namespace ECommerceStore.Api.Data.Migrations
                     b.HasOne("ECommerceStore.Api.Entities.User", null)
                         .WithOne("Address")
                         .HasForeignKey("ECommerceStore.Api.Entities.UserAddress", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerceStore.Api.Entities.UserPaymentDetails", b =>
+                {
+                    b.HasOne("ECommerceStore.Api.Entities.User", null)
+                        .WithOne("PaymentDetails")
+                        .HasForeignKey("ECommerceStore.Api.Entities.UserPaymentDetails", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -560,6 +619,8 @@ namespace ECommerceStore.Api.Data.Migrations
             modelBuilder.Entity("ECommerceStore.Api.Entities.User", b =>
                 {
                     b.Navigation("Address");
+
+                    b.Navigation("PaymentDetails");
                 });
 #pragma warning restore 612, 618
         }

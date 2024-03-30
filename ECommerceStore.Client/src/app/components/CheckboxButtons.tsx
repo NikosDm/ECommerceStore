@@ -19,7 +19,7 @@ export default function CheckboxButtons({
 
     let newChecked: string[] = [];
 
-    if (currentIndex - 1) newChecked = [...checkedItems, value];
+    if (currentIndex === -1) newChecked = [...checkedItems, value];
     else newChecked = checkedItems.filter((item) => item !== value);
     setCheckedItems(newChecked);
     onChange(newChecked);

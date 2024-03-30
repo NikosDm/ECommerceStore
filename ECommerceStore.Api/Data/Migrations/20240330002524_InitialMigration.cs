@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerceStore.Api.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class OrderEntityAdded : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -82,9 +82,13 @@ namespace ECommerceStore.Api.Data.Migrations
                     ShippingAddress_State = table.Column<string>(type: "text", nullable: true),
                     ShippingAddress_Zip = table.Column<string>(type: "text", nullable: true),
                     ShippingAddress_Country = table.Column<string>(type: "text", nullable: true),
-                    OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Subtotal = table.Column<long>(type: "bigint", nullable: false),
-                    DeliveryFee = table.Column<long>(type: "bigint", nullable: false),
+                    PaymentDetails_NameOnCard = table.Column<string>(type: "text", nullable: true),
+                    PaymentDetails_CardNumber = table.Column<string>(type: "text", nullable: true),
+                    PaymentDetails_ExpDate = table.Column<string>(type: "text", nullable: true),
+                    PaymentDetails_Cvv = table.Column<string>(type: "text", nullable: true),
+                    OrderDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Subtotal = table.Column<double>(type: "double precision", nullable: false),
+                    DeliveryFee = table.Column<double>(type: "double precision", nullable: false),
                     OrderStatus = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -100,7 +104,7 @@ namespace ECommerceStore.Api.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    Price = table.Column<long>(type: "bigint", nullable: false),
+                    Price = table.Column<double>(type: "double precision", nullable: false),
                     PictureUrl = table.Column<string>(type: "text", nullable: true),
                     Type = table.Column<string>(type: "text", nullable: true),
                     Brand = table.Column<string>(type: "text", nullable: true),
@@ -242,6 +246,27 @@ namespace ECommerceStore.Api.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserPaymentDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    NameOnCard = table.Column<string>(type: "text", nullable: true),
+                    CardNumber = table.Column<string>(type: "text", nullable: true),
+                    ExpDate = table.Column<string>(type: "text", nullable: true),
+                    Cvv = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPaymentDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserPaymentDetails_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderItem",
                 columns: table => new
                 {
@@ -250,7 +275,7 @@ namespace ECommerceStore.Api.Data.Migrations
                     ItemOrdered_ProductId = table.Column<int>(type: "integer", nullable: true),
                     ItemOrdered_Name = table.Column<string>(type: "text", nullable: true),
                     ItemOrdered_PictureUrl = table.Column<string>(type: "text", nullable: true),
-                    Price = table.Column<long>(type: "bigint", nullable: false),
+                    Price = table.Column<double>(type: "double precision", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     OrderId = table.Column<int>(type: "integer", nullable: true)
                 },
@@ -379,6 +404,9 @@ namespace ECommerceStore.Api.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserAddress");
+
+            migrationBuilder.DropTable(
+                name: "UserPaymentDetails");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

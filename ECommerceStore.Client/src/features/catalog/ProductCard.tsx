@@ -45,7 +45,7 @@ export default function ProductCard({ product }: ProductCardPros) {
       />
       <CardContent>
         <Typography gutterBottom color="secondary" variant="h5">
-          ${(product.price / 100).toFixed(2)}
+          ${product.price}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {product.brand} / {product.type}
@@ -53,7 +53,7 @@ export default function ProductCard({ product }: ProductCardPros) {
       </CardContent>
       <CardActions>
         <LoadingButton
-          loading={status.includes("pendingAddItem" + product.id)}
+          loading={status === "pendingAddItem" + product.id}
           onClick={() =>
             dispatch(addBasketItemAsync({ productId: product.id }))
           }

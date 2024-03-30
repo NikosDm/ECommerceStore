@@ -50,11 +50,10 @@ export default function BasketTable({
                     alt={item.name}
                     style={{ height: 50, marginRight: 20 }}
                   />
+                  <span>{item.name}</span>
                 </Box>
               </TableCell>
-              <TableCell align="right">
-                ${(item.price / 100).toFixed(2)}
-              </TableCell>
+              <TableCell align="right">${item.price}</TableCell>
               <TableCell align="center">
                 {isBasket && (
                   <LoadingButton
@@ -94,9 +93,7 @@ export default function BasketTable({
                   </LoadingButton>
                 )}
               </TableCell>
-              <TableCell align="right">
-                ${((item.price * item.quantity) / 100).toFixed(2)}
-              </TableCell>
+              <TableCell align="right">${item.price * item.quantity}</TableCell>
               {isBasket && (
                 <TableCell align="right">
                   <LoadingButton
