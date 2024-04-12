@@ -58,9 +58,7 @@ export default function Orders() {
               <TableCell component="th" scope="row">
                 {order.id}
               </TableCell>
-              <TableCell align="right">
-                ${(order.total / 100).toFixed(2)}
-              </TableCell>
+              <TableCell align="right">${order.total}</TableCell>
               <TableCell align="right">
                 {order.orderDate.split("T")[0]}
               </TableCell>
